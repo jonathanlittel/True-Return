@@ -1,11 +1,11 @@
 library(dplyr)
 # library(stargazer)
-# library(lattice)
+library(tidyr)
 # library(PerformanceAnalytics)
 library(ggplot2)
 library(caret) # for createDataPartition and createResample
 library(scales) # for $ in plot
-options (scipen = 99, digits = 0)
+options (scipen = 99, digits = 2)
 
 	# Read and merge data
 		  wd <- paste("C:/Box Sync/Risk Appetite - Provisioning Project/",
@@ -13,7 +13,7 @@ options (scipen = 99, digits = 0)
 		            "3.Outputs",
 		            sep="")
 		  setwd(wd)
-		  filename <-  "risk_profile_pds_05.28.16.csv"                       ###### <--- update with next quarter
+		  filename <-  "pds_06.22.16.csv"                       ###### <--- update with next quarter
 		  df.rap <- read.csv(filename, header=TRUE, sep=",")
 		  # rap <- subset(df.rap, last_year==1)
 		  wd <- paste("C:/Box Sync/jlittel/",
@@ -39,11 +39,9 @@ options (scipen = 99, digits = 0)
 	# Use rev / Profitability (option 2/2)
 		filename <- 'True Return dataset for Jon.csv'
 		imp_data <- read.csv(filename, header=TRUE, sep=",")
-		keep_cols <- c('LoanID', 'Net.Loan.Income..Using.Expected.Loss.', 'Final.Impact.Rating', 'Gold...Silver...Bronze.Tiers')
-		imp_data <- imp_data[,names(imp_data) %in% keep_cols]
-		names(imp_data) <- c('LoanID', 'profit', 'Final.Impact.Rating','Highest_Impact_Loans_factor')
+		names(imp_data) <- c('LoanID', 'Final.Impact.Score', 'profit')
 		# rename
-		imp_data <- rename(imp_data, impact_score = Final.Impact.Rating)
+		imp_data <- rename(imp_data, impact_score = Final.Impact.Score)
 
 	# Merge
 		df.rap <- merge(x=df.rap, y=rev_data, by=c("LoanID"), all.x=TRUE)
@@ -53,6 +51,7 @@ options (scipen = 99, digits = 0)
 		              "True Return/",
 		              sep="")
 		  setwd(wd)
+
 
 	# Data cleaning
 		# names(df.rap)[names(df.rap=='Internal.Interest.Rate....')] <- "Internal_Interest_Rate"
