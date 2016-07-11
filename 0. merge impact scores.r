@@ -1,7 +1,5 @@
 library(dplyr)
-# library(stargazer)
 library(tidyr)
-# library(PerformanceAnalytics)
 library(ggplot2)
 library(caret) # for createDataPartition and createResample
 library(scales) # for $ in plot

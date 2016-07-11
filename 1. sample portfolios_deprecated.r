@@ -1,7 +1,17 @@
 # first process and merge data
-	source('# merge impact scores.r')
+	source('0. merge impact scores.r')
 
-# Functions to plot the convex hull of the points
+# or use these two columns
+  wd <- paste("C:/Box Sync/jlittel/",
+          "True Return/data",
+          sep="")
+  	setwd(wd)
+  	filename <- 'True Return dataset for Jon 07.11.16.csv'
+	df <- read.csv(filename)
+	port_sim <- df
+
+
+# Function to plot the convex hull of a set of points
 # per here: http://docs.ggplot2.org/current/vignettes/extending-ggplot2.html
 		StatChull <- ggproto("StatChull", Stat,
 			  compute_group = function(data, scales) {
@@ -21,12 +31,51 @@
 		  )
 		}
 
+# function to simulate portfolios
+#-----------------------------------------------
+simulate_portfolio <- function(x, y, n = 50, p = 0.1, cut = 3.25, weighted = TRUE) {
+	n <- n
+	df <- cbind(x, y)
+	df <- df[complete.cases(df),]
+	df <- data.frame(df)
+	names(df) <- c('x', 'y')
+	loan_count <- rep(NA, n)
+	portfolios <- c(0,0)
+	min_loans <- dim(df)[1]
+	cut <- cut
+	# begin loop
+	for (i in 1:n) {
+		set.seed(i)
+		add_index <- createDataPartition(df[,1], times=1, p= p , list=FALSE)
+		check[i] <- sum(add_index)
+		df_plus <- rbind(df, df[add_index,])
+		# n <- sample(min_loans:nrow(port_sim),1,replace=FALSE) # generate single random n for number of rows in portfolio
+		loan_count[i] <- min_loans
 
-
-############################
-# require(microbenchmark)
+		portfolios <- rbind(portfolios, 
+				df_plus %>% 
+					mutate(weight = (i ^ 1.5 ) / i ) %>%
+					# create a normalized weight for x, and add ~ 4.5 to put it around the impact score
+					mutate(normalized = 4 + (x - min(x)) / (max(x) - min(x))) %>%
+				    sample_n(min_loans, 
+				    	weight = if (weighted) {
+				    		( y^weight + normalized^weight)
+				    		} else {
+				    			NULL 
+				    		}) %>% 
+				    # summarise_each(funs(mean)) %>%
+				    summarise(
+				    	total_profit = sum(x),
+				    	impact_score_above_cut = sum(y>cut),
+				    	avg_impact_score = mean(y))
+		    )
+	}
+	portfolios[-1,]
+}	
+portfolios1 <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 50, p = 0.101, cut = 3.25, weighted = TRUE)
+#---------------------------
 # 0. Sample using Impact.Rating	
-############################	
+#---------------------------	
 	# Generate portfolio combinations
 	port_sim <- select(df.rap.inactive, Marginal_Revenue, impact_score)  # Highest_Impact_Loans
 	dim(port_sim)
@@ -53,12 +102,13 @@
 	port_plot1 <- port_plot1 + geom_point() + stat_chull(fill = NA, colour = "blue")
 	port_plot1
 
-########################################################
+#---------------------------#---------------------------
 # 1. average impact score
-##########################################################################
-	n <- 5000
+#---------------------------#---------------------------##################
+	n <- 50
 	# n <- 10
-	port_sim <- select(df.rap, profit, impact_score)
+	# port_sim <- select(df.rap, profit, impact_score)
+	port_sim <- select(df, profit = Expected.Value.of.Net.Loan.Income, impact_score = Impact.Rating...10.Point.Scale)
 	port_sim <- port_sim[complete.cases(port_sim),]
 	check <- 1
 
@@ -93,13 +143,14 @@
 
 
 
-########################################################
+#---------------------------#---------------------------
 # 2.  Sample Highest_Impact_Loans as % of portfolio and 'profit'
-##########################################################################
+#---------------------------#---------------------------##################
 	n <- 5e3
 	port_sim <- select(df.rap, profit, impact_score)  # Option 2
 	port_sim <- port_sim[complete.cases(port_sim),]
 	test <- 1
+	cut <- 3.25
 
 	loan_count <- rep(NA, n)
 	portfolios <- c(0,0) #port_sim[1,] # simple way to create the dataframe - remove this row after loop
@@ -121,7 +172,7 @@
 				    # summarise_each(funs(mean)) %>%
 				    summarise(
 				    	total_profit = sum(profit), 
-				    	imp_score_above_325 = (sum(impact_score>3.25)/loan_count[i])
+				    	imp_score_above_325 = (sum(impact_score>cut)/loan_count[i])
 				    	)
 		    )
 
@@ -130,9 +181,9 @@
 portfolios2 <- portfolios[-1,] # remove first row since it was instantiated w sample data
 
 
-########################################################
+#---------------------------#---------------------------
 # 3.  Sample Highest_Impact_Loans as % of portfolio and 'profit'
-##########################################################################
+#---------------------------#---------------------------##################
 	n <- 5e3
 	port_sim <- select(df.rap, profit, impact_score)  # Option 2
 	port_sim <- port_sim[complete.cases(port_sim),]
@@ -164,14 +215,14 @@ portfolios2 <- portfolios[-1,] # remove first row since it was instantiated w sa
 	}
 
 portfolios3 <- portfolios[-1,] # remove first row since it was instantiated w sample data
-###################################################################
+#---------------------------#---------------------------###########
 # portfolios	<- cbind(portfolios, loan_count)
 # portfolios$pct_gold_silver <- portfolios[,2] / portfolios$loan_count
 # names(portfolios) <- c('profit', 'gold_silver_count', 'loan_count', 'pct_gold_silver')
 
-########################################################
+#---------------------------#---------------------------
 # 4.  weighted sampling
-##########################################################################
+#---------------------------#---------------------------##################
 	n <- 1e6
 	n <- 10
 	port_sim <- select(df.rap, profit, impact_score)  # Option 2
@@ -201,7 +252,7 @@ portfolios3 <- portfolios[-1,] # remove first row since it was instantiated w sa
 	}
 
 portfolios2 <- portfolios[-1,] # remove first row since it was instantiated w sample data
-###############################################
+#---------------------------###################
 # Some different plots
 	port_current <- data.frame(profit = sum(port_sim[,1]), pct_gold_silver = sum(port_sim[,2] / nrow(port_sim))) # add current portfolio points
 
