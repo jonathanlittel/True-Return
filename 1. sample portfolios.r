@@ -56,10 +56,13 @@ simulate_portfolio <- function(x, y, n = 50, p = 0.1, cut = 3.25, weighted = TRU
 				df_plus %>% 
 					mutate(weight = (i ^ 1.5 ) / i ) %>%
 					# create a normalized weight for x, and add ~ 4.5 to put it around the impact score
-					mutate(normalized = (x - min(x)) / (max(x) - min(x))) %>%
+					mutate(
+						normalized_x = (x - min(x)) / (max(x) - min(x)),
+						normalized_y = (y - min(y)) / (max(y) - min(y))
+						) %>%
 				    sample_n(min_loans, 
 				    	weight = if (weighted) {
-				    		( y^weight + (normalized * 10 )^weight)
+				    		(normalized_y^weight) + (normalized_x^weight)
 				    		} else {
 				    			NULL 
 				    		}) %>% 
@@ -72,4 +75,14 @@ simulate_portfolio <- function(x, y, n = 50, p = 0.1, cut = 3.25, weighted = TRU
 	}
 	portfolios[-1,]
 }	
-portfolios1 <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 50, p = 0.101, cut = 3.25, weighted = TRUE)
+
+
+# create portfolios 
+  # cut above 3.25
+  portfolios1 <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e5, p = 0.101, cut = 3.25, weighted = TRUE)
+  portfolios1a <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e4, p = 0.101, cut = 3.25, weighted = FALSE)
+
+  # cut above 6.25
+  portfolios2 <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e5, p = 0.101, cut = 6.25, weighted = TRUE)
+  portfolios2a <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e4, p = 0.101, cut = 6.25, weighted = FALSE)
+ 

@@ -1,9 +1,9 @@
 # add three points, for the stat_chull area plot - the max profit at 0% impact, 0,0, and 100% impact at the min profit
-	portfolios_plot1 <- rbind(portfolios1,
+	portfolios_plot1 <- rbind(
+		portfolios1,
+		portfolios1a,
 		data.frame(
 			total_profit = c(max(portfolios1[,1]), min(portfolios1[,1]), min(portfolios1[,1])),
-			# gold_silver_count = c(NA, NA, NA),
-			# loan_count = c(NA, NA, NA),
 			avg_impact_score = c(min(portfolios1[,2]), min(portfolios1[,2]), max(portfolios1[,2]))
 			)
 		)
