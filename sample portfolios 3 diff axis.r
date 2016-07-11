@@ -96,7 +96,7 @@
 ########################################################
 # 2.  Sample Highest_Impact_Loans as % of portfolio and 'profit'
 ##########################################################################
-	n <- 5e2
+	n <- 5e3
 	port_sim <- select(df.rap, profit, impact_score)  # Option 2
 	port_sim <- port_sim[complete.cases(port_sim),]
 	test <- 1
@@ -121,8 +121,7 @@
 				    # summarise_each(funs(mean)) %>%
 				    summarise(
 				    	total_profit = sum(profit), 
-				    	imp_score_above_325 = (sum(impact_score>3.25)/loan_count[i]),
-				    	n = n()
+				    	imp_score_above_325 = (sum(impact_score>3.25)/loan_count[i])
 				    	)
 		    )
 
@@ -134,15 +133,14 @@ portfolios2 <- portfolios[-1,] # remove first row since it was instantiated w sa
 ########################################################
 # 3.  Sample Highest_Impact_Loans as % of portfolio and 'profit'
 ##########################################################################
-	n <- 1e6
-	n <- 10
+	n <- 5e3
 	port_sim <- select(df.rap, profit, impact_score)  # Option 2
 	port_sim <- port_sim[complete.cases(port_sim),]
 	test <- 1
 
 	loan_count <- rep(NA, n)
 	portfolios <- c(0,0) #port_sim[1,] # simple way to create the dataframe - remove this row after loop
-	min_loans <- 315 # minimum number of loans in p
+	min_loans <- dim(port_sim)[1] # minimum number of loans in p
 	for (i in 1:n) {
 		set.seed(i)
 		add_index <- createDataPartition(port_sim[,1], times=1, p=0.1, list=FALSE)
@@ -152,13 +150,17 @@ portfolios2 <- portfolios[-1,] # remove first row since it was instantiated w sa
 		loan_count[i] <- min_loans
 
 		portfolios <- rbind(portfolios, 
-				port %>% 
-				    sample_n(min_loans) %>%
+				port %>%
+					mutate(weight = (i ^ 1.5 ) / i ) %>%
+					# create a normalized weight for profit, and add ~ 4.5 to put it around the impact score
+					mutate(normalized = 4 + (profit - min(profit)) / (max(profit) - min(profit))) %>% 
+				    sample_n(min_loans, weight= ( impact_score^weight + normalized^weight)) %>%
 				    # summarise_each(funs(mean)) %>%
-				    summarise(total_profit = sum(profit), 
-				    	imp_score_above_2_pct = (sum(impact_score>2)/loan_count[i]))
+				    summarise(
+				    	total_profit = sum(profit), 
+				    	imp_score_above_625 = (sum(impact_score>6.25)/loan_count[i])
+				    	)
 		    )
-
 	}
 
 portfolios3 <- portfolios[-1,] # remove first row since it was instantiated w sample data

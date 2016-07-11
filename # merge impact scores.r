@@ -42,6 +42,10 @@ options (scipen = 99, digits = 2)
 		names(imp_data) <- c('LoanID', 'Final.Impact.Score', 'profit')
 		# rename
 		imp_data <- rename(imp_data, impact_score = Final.Impact.Score)
+		# # imp_data <- imp_data %>%
+		# #   mutate(profit=replace(profit, profit=="#N/A", NA))
+		# imp_data$profit <- as.numeric(imp_data$profit)
+
 
 	# Merge
 		df.rap <- merge(x=df.rap, y=rev_data, by=c("LoanID"), all.x=TRUE)
@@ -75,7 +79,7 @@ options (scipen = 99, digits = 2)
 	# Interest expense is 2.4% over life of loan, opex is flat $XXX per loan,  yield is actual yield over actual average balance 
 												# note, should subset for loans that went to nonaccrual
 												# df.rap$Internal.Interest.Rate.... != 0
-		df.rap$interest_expense <- df.rap$Tenor_years * 0.025
+		df.rap$interest_expense <- df.rap$tenor_years_min1 * 0.025
 		# df.rap$Interest_Expense <- df.rap$interest_exp_assum * df.rap$Months_outstanding_to_date / 12
 		df.rap$Marginal_Opex <- 0 / df.rap$Average_Balance   # somewhere in the range of $1-2k, could be relative to pd (workouts)
 		df.rap$LGD <- 0.90
@@ -87,8 +91,8 @@ options (scipen = 99, digits = 2)
 
 	# Subset to exclude active loans and those that went on non-accrual
 		df.rap.inactive <- filter(df.rap, active==0)  # , Internal_Interest_Rate >0
-		table(df.rap.inactive$Marginal_Revenue>0)
-
+		prop.table(table(df.rap.inactive$Marginal_Revenue>0))
+		prop.table(table((df.rap.inactive$Yield - (df.rap.inactive$pd* 0.9))>0))
 
 
 
