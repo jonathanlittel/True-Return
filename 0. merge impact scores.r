@@ -1,4 +1,4 @@
-library(dplyr)
+library(dplyr)  require(dplyr)
 library(tidyr)
 library(ggplot2)
 library(caret) # for createDataPartition and createResample
@@ -91,17 +91,6 @@ options (scipen = 99, digits = 2)
 		df.rap.inactive <- filter(df.rap, active==0)  # , Internal_Interest_Rate >0
 		prop.table(table(df.rap.inactive$Marginal_Revenue>0))
 		prop.table(table((df.rap.inactive$Yield - (df.rap.inactive$pd* 0.9))>0))
-
-
-
-
-
-
-
-
-
-
-
 
 
 # compare short term and long term net_rev (actual revenue / average balance, less pd)

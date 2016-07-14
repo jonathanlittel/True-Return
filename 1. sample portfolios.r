@@ -33,12 +33,19 @@
 
 # function to simulate portfolios
 #-----------------------------------------------
-simulate_portfolio <- function(x, y, n = 50, p = 0.1, cut = 3.25, weighted = TRUE) {
+simulate_portfolio <- function(x, y, n = 50, p = 0.1, cut = 3.25, weighted = TRUE, x_weight = 1, y_weight = 1) {
 	n <- n
 	df <- cbind(x, y)
 	df <- df[complete.cases(df),]
 	df <- data.frame(df)
 	names(df) <- c('x', 'y')
+	df <- df %>%
+			# mutate(weight = log(i) ^ 2 ) %>% # option tweak to weighting
+			# create a normalized val for weight for x and y
+			mutate(
+				normalized_x = (x - min(x)) / (max(x) - min(x)),
+				normalized_y = (y - min(y)) / (max(y) - min(y))
+				) 
 	loan_count <- rep(NA, n)
 	portfolios <- c(0,0)
 	min_loans <- dim(df)[1]
@@ -46,23 +53,33 @@ simulate_portfolio <- function(x, y, n = 50, p = 0.1, cut = 3.25, weighted = TRU
 	# begin loop
 	for (i in 1:n) {
 		set.seed(i)
-		add_index <- createDataPartition(df[,1], times=1, p= p , list=FALSE)
-		check[i] <- sum(add_index)
-		df_plus <- rbind(df, df[add_index,])
+		# add_index <- createDataPartition(df[,1], times=1, p= p , list=FALSE)
+		# check[i] <- sum(add_index)
+		# df_plus <- rbind(df, df[add_index,])
+		df_plus <- rbind(
+			df,
+			sample_n(df,
+				size = 25,
+				weight = if (weighted) {
+					    		(1 + normalized_x)^x_weight + (1 + normalized_y)^y_weight
+					    		} else {
+					    			NULL 
+					    		})
+					    )	
 		# n <- sample(min_loans:nrow(port_sim),1,replace=FALSE) # generate single random n for number of rows in portfolio
 		loan_count[i] <- min_loans
 
 		portfolios <- rbind(portfolios, 
 				df_plus %>% 
-					mutate(weight = (i ^ 1.5 ) / i ) %>%
-					# create a normalized weight for x, and add ~ 4.5 to put it around the impact score
-					mutate(
-						normalized_x = (x - min(x)) / (max(x) - min(x)),
-						normalized_y = (y - min(y)) / (max(y) - min(y))
-						) %>%
+					# # mutate(weight = log(i) ^ 2 ) %>% # option tweak to weighting
+					# # create a normalized val for weight for x and y
+					# mutate(
+					# 	normalized_x = (x - min(x)) / (max(x) - min(x)),
+					# 	normalized_y = (y - min(y)) / (max(y) - min(y))
+					# 	) %>%
 				    sample_n(min_loans, 
 				    	weight = if (weighted) {
-				    		(normalized_y^weight) + (normalized_x^weight)
+				    		(1 + normalized_x)^x_weight + (1 + normalized_y)^y_weight
 				    		} else {
 				    			NULL 
 				    		}) %>% 
@@ -76,13 +93,30 @@ simulate_portfolio <- function(x, y, n = 50, p = 0.1, cut = 3.25, weighted = TRU
 	portfolios[-1,]
 }	
 
-
 # create portfolios 
   # cut above 3.25
-  portfolios1 <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e5, p = 0.101, cut = 3.25, weighted = TRUE)
+  portfolios1  <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 1.1, y_weight = 2)
   portfolios1a <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e4, p = 0.101, cut = 3.25, weighted = FALSE)
+  portfolios1b <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 2, y_weight = 3)
+  portfolios1c <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 2, y_weight = 1.5)
+  portfolios1d <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 3, y_weight = 3)
+  portfolios1e <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 3, y_weight = 3)
+  portfolios1f <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 100, y_weight = 100)
+  portfolios1g <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 3e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 150, y_weight = 100)
+  portfolios1h <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 3e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 150, y_weight = 100)
+  portfolios1i <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 150, y_weight = 1)
+  portfolios1j <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 4, y_weight = 2)
+  portfolios1z <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e4, p = 0.101, cut = 3.25, weighted = TRUE, x_weight = 4, y_weight = 2)
 
   # cut above 6.25
-  portfolios2 <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e5, p = 0.101, cut = 6.25, weighted = TRUE)
-  portfolios2a <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e4, p = 0.101, cut = 6.25, weighted = FALSE)
- 
+  # portfolios2  <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e3, p = 0.101, cut = 6.25, weighted = TRUE)
+  portfolios2a <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 6.25, weighted = FALSE)
+  portfolios2b <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 6.25, weighted = TRUE, x_weight = 2, y_weight = 2)
+  # portfolios2c <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 6.25, weighted = TRUE, x_weight = 1, y_weight = 3)
+  # portfolios2d <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 6.25, weighted = TRUE, x_weight = 1, y_weight = 4)
+  # portfolios2e <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 6.25, weighted = TRUE, x_weight = 2, y_weight = 1)
+  # portfolios2f <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 6.25, weighted = FALSE)
+  portfolios2g <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 5e4, p = 0.101, cut = 6.25, weighted = TRUE, x_weight = 1.5, y_weight = 2)
+  portfolios2h <- simulate_portfolio(port_sim[,1], port_sim[,2], n = 1e4, p = 0.101, cut = 6.25, weighted = TRUE, x_weight = 3, y_weight = 2)
+
+quantile(port_sim[,1])
