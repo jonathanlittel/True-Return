@@ -42,7 +42,7 @@
 	 		),
 		data.frame(   # these are the corner points for the area file stat_chull chart
 			# points:      _upper left_               _lower left_           _lower right_
-			total_profit = c(-2e6, -4999999, -4999999),
+			total_profit = c(-2e6, -3999999, -3999999),
 			impact_score_above_cut = c(145, 145, 170), 
 			avg_impact_score = c(min(portfolios1[,2]), min(portfolios1[,2]), max(portfolios1[,2]))
 			)
@@ -57,7 +57,7 @@
     port_plot1 + 
 	 geom_point(alpha=0.005, size=0.75,) +
 	 stat_chull(fill = 'blue', alpha=0.25, colour = 'white', size=1) +
-	 scale_y_continuous('', label=scales::dollar, limits=c(-5,0)) + # 'Philanthropic Support Required ($M)',
+	 scale_y_continuous('', label=scales::dollar, limits=c(-4,0)) + # 'Philanthropic Support Required ($M)',
 	 geom_point(data= port_current, colour='white', size=5) + 
 	 scale_x_continuous('',limits=c(145, 175)) # +  '# of loans commercial lenders likely would not have done in our absence'
 	 # geom_text(data=port_current,  vjust=0.45, hjust=-.25, colour='white', size=5) # label='Current Portfolio',
@@ -96,7 +96,7 @@ ggsave(filename = 'plot1.png', plot = last_plot(), # device = default_device(fil
 		plot_data2,
 			data.frame(   # these are the corner points for the area file stat_chull chart
 			# points:      _upper left_               _lower left_           _lower right_
-			total_profit = c(max(plot_data2[,1])+1e5, -4999999, -4999999),
+			total_profit = c(max(plot_data2[,1])+1e5, -3999999, -3999999),
 			impact_score_above_cut = c(40, 40, max(plot_data2[,2])), 
 			avg_impact_score = c(min(plot_data2[,2]), min(plot_data2[,2]), max(plot_data2[,2]))
 			)
@@ -118,7 +118,7 @@ ggsave(filename = 'plot1.png', plot = last_plot(), # device = default_device(fil
     port_plot2 + 
 	 geom_point(alpha=0.005, size=0.75,) +
 	 stat_chull(fill = 'blue', alpha=0.25, colour = 'white', size=1) +
-	 scale_y_continuous('', label=scales::dollar, limits=c(-5,0)) + # 'Philanthropic Support Required ($M)',
+	 scale_y_continuous('', label=scales::dollar, limits=c(-4,0)) + # 'Philanthropic Support Required ($M)',
 	 geom_point(data= port_current2, colour='white', size=5) + 
 	 scale_x_continuous('',limits=xlims2) # +  '# of loans commercial lenders likely would not have done in our absence'
 	 # geom_text(data=port_current,  vjust=0.45, hjust=-.25, colour='white', size=5) # label='Current Portfolio',
@@ -137,14 +137,14 @@ ggsave(filename = 'plot2.png', plot = last_plot(), # device = default_device(fil
 	plot_data2$category <- 'above625'
 	plot1_edges <- data.frame(   # these are the corner points for the area file stat_chull chart
 			# points:      _upper left_               _lower left_           _lower right_
-			total_profit = c(max(plot_data2[,1]), -4999999, -4999999),
+			total_profit = c(max(plot_data2[,1]), -3999999, -3999999),
 			impact_score_above_cut = c(35, 35, 170), 
 			avg_impact_score = c(min(plot_data1[,2]), min(plot_data1[,2]), max(plot_data1[,2])),
 			category = 'above325'
 			)	
 	plot2_edges <- data.frame(   # these are the corner points for the area file stat_chull chart
 			# points:      _upper left_               _lower left_           _lower right_
-			total_profit = c(max(plot_data2[,1]), -4999999, -4999999),
+			total_profit = c(max(plot_data2[,1]), -3999999, -3999999),
 			impact_score_above_cut = c(35, 35, 50), 
 			avg_impact_score = c(min(plot_data2[,2]), min(plot_data2[,2]), max(plot_data2[,2])),
 			category = 'above625'
@@ -168,7 +168,7 @@ ggsave(filename = 'plot2.png', plot = last_plot(), # device = default_device(fil
 	 geom_point(alpha=0.005, size=0.75, ) +
 	 stat_chull(fill = 'blue', alpha=0.25, colour = 'white', size=1) +
 	 scale_x_continuous('',limits=c(35, 170)) +
-	 scale_y_continuous('', label=scales::dollar, limits=c(-5,0)) + 
+	 scale_y_continuous('', label=scales::dollar, limits=c(-4,0)) + 
 	 geom_point(data= port_current, colour='white', size=5) +	 
 	 geom_point(data= port_current2, colour='white', size=5)
 	 # scale_y_continuous('', label=scales::dollar, limits=c(-5,0)) + # 'Philanthropic Support Required ($M)',
