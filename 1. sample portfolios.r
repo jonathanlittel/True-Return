@@ -8,8 +8,9 @@
   	setwd(wd)
   	filename <- 'True Return dataset for Jon 07.11.16.csv'
 	df <- read.csv(filename)
-	port_sim <- df
-
+	port_sim <- rename(df, 
+			profit = Expected.Value.of.Net.Loan.Income,
+			impact_score = Impact.Rating...10.Point.Scale)
 
 # Function to plot the convex hull of a set of points
 # per here: http://docs.ggplot2.org/current/vignettes/extending-ggplot2.html

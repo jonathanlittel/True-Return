@@ -35,11 +35,13 @@ options (scipen = 99, digits = 2)
 		rev_data$Portfolio_Revenue <- as.numeric(as.character(rev_data$Portfolio_Revenue))
 
 	# Use rev / Profitability (option 2/2)
-		filename <- 'True Return dataset for Jon.csv'
+		filename <- 'True Return dataset for Jon 07.11.16.csv'
 		imp_data <- read.csv(filename, header=TRUE, sep=",")
-		names(imp_data) <- c('LoanID', 'Final.Impact.Score', 'profit')
+		names(imp_data) <- c('LoanID', 'profit', 'impact_score')
 		# rename
-		imp_data <- rename(imp_data, impact_score = Final.Impact.Score)
+		# imp_data <- rename(imp_data, 
+		# 	profit = Expected.Value.of.Net.Loan.Income,
+		# 	impact_score = Impact.Rating...10.Point.Scale)
 		# # imp_data <- imp_data %>%
 		# #   mutate(profit=replace(profit, profit=="#N/A", NA))
 		# imp_data$profit <- as.numeric(imp_data$profit)
