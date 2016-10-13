@@ -31,7 +31,7 @@
 		portfolios1m
 		)
 	port_current <- data.frame(
-		total_profit = sum(port_sim[,1]),
+		total_profit = sum(port_sim$profit),
 		impact_score_above_cut = sum(port_sim$impact_score>3.25),
 		category = 'above325'
 		)
@@ -53,7 +53,7 @@
 	# 							group_by(impact_score_above_cut) %>%
 	# 							mutate(impact_score_above_cut_max = max(total_profit))
 	port_plot1 <- ggplot(
-		filter(plot_data1, total_profit>=-5e6), aes(impact_score_above_cut, total_profit/1e6 ))
+		filter(plot_data1, total_profit>=-5e6, total_profit <= -2e6), aes(impact_score_above_cut, total_profit/1e6 ))
     port_plot1 + 
 	 geom_point(alpha=0.005, size=0.75,) +
 	 stat_chull(fill = 'blue', alpha=0.25, colour = 'white', size=1) +
@@ -178,6 +178,13 @@ ggsave(filename = 'plot2.png', plot = last_plot(), # device = default_device(fil
 
 ggsave(filename = 'plot3.png', plot = last_plot(), # device = default_device(filename),
    scale = 1, width = par("din")[1], height = par("din")[2], units = c("in"), dpi = 600) # path = NULL,
+
+
+
+out1 <- filter(plot_data1, total_profit>=-5e6, total_profit <= -2e6)
+out1 <- out1 %>% group_by(impact_score_above_cut) %>% summarise(max(total_profit))
+write.csv(out1, 'plot1_data.csv', row.names = FALSE)
+
 
 
 # #---------------------------------

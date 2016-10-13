@@ -1,4 +1,4 @@
-library(dplyr)  require(dplyr)
+library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(caret) # for createDataPartition and createResample
@@ -11,7 +11,7 @@ options (scipen = 99, digits = 2)
 		            "3.Outputs",
 		            sep="")
 		  setwd(wd)
-		  filename <-  "pds_06.22.16.csv"                       ###### <--- update with next quarter
+		  filename <-  "pds_08.19.16.csv"                       ###### <--- update with next quarter
 		  df.rap <- read.csv(filename, header=TRUE, sep=",")
 		  # rap <- subset(df.rap, last_year==1)
 		  wd <- paste("C:/Box Sync/jlittel/",
@@ -98,6 +98,6 @@ options (scipen = 99, digits = 2)
 # compare short term and long term net_rev (actual revenue / average balance, less pd)
 # note that whill underestimate, since actual rev will include loss
 	df.rap.inactive$net_rev <- df.rap.inactive$Yield - df.rap.inactive$pd
-	df.rap.inactive$st <- df.rap.inactive$Tenor_years<=1
+	df.rap.inactive$st <- df.rap.inactive$tenor_years_min1<=1
 	g <- ggplot(df.rap.inactive, aes(x=st, y=net_rev))
 	g + geom_boxplot()
